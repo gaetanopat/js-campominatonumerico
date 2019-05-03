@@ -9,8 +9,6 @@
 
 // per i numeri del pc
 var pc_numbers = [];
-// per vedere quando finisce di inserire i 16 numeri può partire con la richiesta dei numeri all'utente
-var finish = 0;
 // per calcolare quante volte ha inserito un numero prima di sbagliare
 var volte = 0;
 // per scegliere la difficoltà del gioco
@@ -28,31 +26,22 @@ if ((choice == 'Principiante') || (choice == 'Intermedio') || (choice == 'Espert
   if(choice == 'Principiante'){
     // numeri random da 1 a 100
     GenRandomNum(100);
+    // 100 - 16
+    choiceLevel(100, 84);
   }
   if(choice == 'Intermedio'){
     // numeri random da 1 a 80
     GenRandomNum(80);
+    // 80 - 16
+    choiceLevel(80, 64);
   }
   if(choice == 'Esperto'){
     // numeri random da 1 a 50
     GenRandomNum(50);
+    // 50 - 16
+    choiceLevel(50, 34);
   }
 
-  // quando finisco di generare i 16 numeri
-  if (finish == 15){
-    if(choice == 'Principiante'){
-      // 100 - 16
-      choiceLevel(84);
-    }
-    if(choice == 'Intermedio'){
-      // 80 - 16
-      choiceLevel(64);
-    }
-    if(choice == 'Esperto'){
-      // 50 - 16
-      choiceLevel(34);
-    }
-  }
   // se trova il numero inserito dall'utente nell'array del pc
   if(trovato == true){
     document.writeln('Hai totalizzato un totale di : ' + (volte - 1) + ' punti, visto che la ' + volte + ' volta hai sbagliato');
@@ -63,42 +52,64 @@ else{
   document.writeln('Hai sbagliato a scrivere la difficoltà');
 }
 
+
 // per generare 16 numeri random
 function GenRandomNum(max_numbers){
-  // genero 16 numeri da 1 a 100
-  for (var i = 0; i < 16; i++){
-    pc_numbers.push(Math.floor(Math.random() * max_numbers) + 1);
-    console.log(pc_numbers[i]);
-    document.writeln(pc_numbers[i] + '<br>');
-    finish = i;
+  // genero 16 numeri da 1 a 100 (dipende dalla difficoltà che l'utente sceglie)
+  for(var i = 0; i < 16; i++){ // oppure while(pc_number.length<16)
+    var number = Math.floor(Math.random() * max_numbers) + 1;
+    // se non esiste lo inserisco
+    if(pc_numbers.includes(number) == false){
+      pc_numbers.push(number);
+    }
   }
+  console.log(pc_numbers);
+  document.writeln(pc_numbers.join('<br>') + '<br>');
 }
 
+
 // per il numero di tentativi
-function choiceLevel(tentativi){
-  var max_tentativi = 0;
+function choiceLevel(max_numbers, max_tentativi){
+  var tentativi = 1;
   // per i numeri che inserisce l'utente
   var user_numbers;
+  var user_array = [];
 
   // fin quando trovato sarà false  e i tentativi saranno <= 84 allora mi ripeterà il ciclo
-  while (trovato == false && max_tentativi <= tentativi){
-    console.log(max_tentativi + ' tentativo');
-    if (max_tentativi == tentativi){
+  while (trovato == false && tentativi <= max_tentativi){
+    console.log(tentativi + ' tentativo');
+
+    // quando i tentativi saranno == 84 (dipende dalla difficoltà che sceglie l'utente)
+    if (tentativi == max_tentativi){
       document.writeln('<br> Avendo terminato le chance Hai vinto!');
-      document.writeln('<br> Totale punteggio: ' + tentativi);
+      document.writeln('<br> Totale punteggio: ' + max_tentativi);
     } else {
-      user_numbers = parseInt(prompt('Inserisci un numero'));
+      user_numbers = parseInt(prompt('Inserisci un numero da 1 a ' + max_numbers));
+
+      // se non è presente nell'array dei numeri dell'utente lo pusho
+      if(user_array.includes(user_numbers) == false){
+        user_array.push(user_numbers);
+      } else {
+        // altrimenti è già presente nell'array
+        alert('Hai già inserito questo numero');
+        // non dovrà incrementare le volte e i tentativi
+        volte -= 1;
+        tentativi -= 1;
+      }
+      console.log('Array utente: ' + user_array);
+
       // scorro per vedere se il valore è presente nell'array dei numeri del computer
-        for(var i = 0; i < 16; i++){
-          // se il numero inserito è uguale all'array dei numeri del pc
-          if (user_numbers == pc_numbers[i]){
-            document.writeln('<br>' + user_numbers + ' è un numero "vietato", quindi Hai perso <br>');
-            // trovo l'elemento
-            trovato = true;
-          }
+      for(var j = 0; j < 16; j++){
+        // se il numero inserito è uguale all'array dei numeri del pc
+        if (user_numbers == pc_numbers[j]){
+          document.writeln('<br>' + user_numbers + ' è un numero "vietato", quindi Hai perso <br>');
+          // trovo l'elemento
+          trovato = true;
         }
-    volte += 1;
+      }
+      // incremento per tener conto delle volte che va senza sbagliare
+      volte += 1;
     }
-    max_tentativi += 1;
+    tentativi += 1;
   }
 }
